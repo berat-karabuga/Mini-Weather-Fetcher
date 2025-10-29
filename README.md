@@ -51,8 +51,6 @@ The application is fully functional and successfully executes all necessary netw
 
 # ☀️ Mini Weather Fetcher App (Hava Durumu Veri Çekme Uygulaması)
 
-!(https://user-images.githubusercontent.com/9587600/220275525-24c58f00-36b1-4f11-92be-3f3f5a04e90d.png)
-
 ## 🇹🇷 Proje Hakkında (About the Project)
 
 Bu proje, **Meta Android Developer Professional Certificate** programının "Working with Data in Android" kursunun "Interacting with Rest APIs in Android" modülünde öğrenilen bilgileri pekiştirmek amacıyla geliştirilmiş bir **pratik mini-projedir**.
