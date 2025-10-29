@@ -1,6 +1,4 @@
 # ☀️ Mini Weather Fetcher App
-
-
 ## 🎯 Project Overview
 
 This is a **practice mini-project** developed to solidify the knowledge gained from the **Meta Android Developer Professional Certificate** program, specifically within the "Interacting with REST APIs in Android" module of the "Working with Data in Android" course.
