@@ -1,6 +1,5 @@
 # ☀️ Mini Weather Fetcher App
 
-!(https://user-images.githubusercontent.com/9587600/220275525-24c58f00-36b1-4f11-92be-3f3f5a04e90d.png)
 
 ## 🎯 Project Overview
 
