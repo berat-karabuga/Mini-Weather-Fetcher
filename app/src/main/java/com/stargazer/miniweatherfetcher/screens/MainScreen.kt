@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -24,14 +25,18 @@ import com.stargazer.miniweatherfetcher.navigation.BottomNavItem
 import com.stargazer.miniweatherfetcher.navigation.Compare
 import com.stargazer.miniweatherfetcher.navigation.Favorites
 import com.stargazer.miniweatherfetcher.navigation.Home
+import com.stargazer.miniweatherfetcher.screens.CompareScreen
+import com.stargazer.miniweatherfetcher.screens.FavoritesScreen
+import com.stargazer.miniweatherfetcher.screens.HomeScreen
 
+import com.stargazer.miniweatherfetcher.viewmodel.HomeViewModel
 
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val sharedHomeViewModel: HomeViewModel = viewModel()
 
     val bottomNavItems = listOf(
         BottomNavItem("Ana Sayfa", Home, Icons.Default.Home),
@@ -68,8 +73,30 @@ fun MainScreen() {
             startDestination = Home,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable<Home> { HomeScreen() }
-            composable<Favorites> { FavoritesScreen() }
+            composable<Home> {
+                HomeScreen(viewModel = sharedHomeViewModel)
+            }
+
+            composable<Favorites> {
+                FavoritesScreen(
+                    onCityClick = { selectedCity ->
+                        sharedHomeViewModel.fetchWeather(
+                            lat = selectedCity.latitude,
+                            long = selectedCity.longitude,
+                            cityName = selectedCity.cityName
+                        )
+
+                        navController.navigate(Home) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
+
             composable<Compare> { CompareScreen() }
         }
     }

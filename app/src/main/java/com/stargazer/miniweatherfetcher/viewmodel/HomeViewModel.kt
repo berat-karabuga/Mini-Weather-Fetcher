@@ -3,8 +3,10 @@ package com.stargazer.miniweatherfetcher.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stargazer.miniweatherfetcher.data.RetrofitClient
-import com.stargazer.miniweatherfetcher.model.CurrentWeather
+import com.stargazer.miniweatherfetcher.data.local.DatabaseProvider
+import com.stargazer.miniweatherfetcher.data.local.FavoriteCity
 import com.stargazer.miniweatherfetcher.model.LocationResult
+import com.stargazer.miniweatherfetcher.model.WeatherResponse // YENİ IMPORT
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,11 +16,12 @@ import kotlinx.coroutines.launch
 
 sealed class WeatherState {
     object Loading : WeatherState()
-    data class Success(val weather: CurrentWeather, val cityName: String) : WeatherState()
+    data class Success(val response: WeatherResponse, val cityName: String, val lat: Double, val long: Double) : WeatherState()
     data class Error(val message: String) : WeatherState()
 }
 
 class HomeViewModel : ViewModel() {
+    private val dao = DatabaseProvider.db.favoriteDao()
     private val _weatherState = MutableStateFlow<WeatherState>(WeatherState.Loading)
     val weatherState: StateFlow<WeatherState> = _weatherState.asStateFlow()
     private val _searchQuery = MutableStateFlow("")
@@ -27,24 +30,22 @@ class HomeViewModel : ViewModel() {
     val searchResults = _searchResults.asStateFlow()
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
+    private val _isFavorite = MutableStateFlow(false)
+    val isFavorite = _isFavorite.asStateFlow()
     private var searchJob: Job? = null
 
     fun onSearchQueryChange(query: String) {
         _searchQuery.value = query
-
         if (query.length < 2) {
             searchJob?.cancel()
             _searchResults.value = emptyList()
             _isSearching.value = false
             return
         }
-
         searchJob?.cancel()
-
         searchJob = viewModelScope.launch {
-            delay(100)
+            delay(500)
             _isSearching.value = true
-
             try {
                 val response = RetrofitClient.api.searchCity(query)
                 _searchResults.value = response.results ?: emptyList()
@@ -66,9 +67,23 @@ class HomeViewModel : ViewModel() {
             _weatherState.value = WeatherState.Loading
             try {
                 val response = RetrofitClient.api.getWeather(lat, long)
-                _weatherState.value = WeatherState.Success(response.current, cityName)
+                _weatherState.value = WeatherState.Success(response, cityName, lat, long)
+                _isFavorite.value = dao.isFavorite(cityName)
             } catch (e: Exception) {
                 _weatherState.value = WeatherState.Error("Hava durumu alınamadı. İnternetinizi kontrol edin.")
+            }
+        }
+    }
+
+    fun toggleFavorite(cityName: String, lat: Double, long: Double) {
+        viewModelScope.launch {
+            val city = FavoriteCity(cityName, lat, long)
+            if (_isFavorite.value) {
+                dao.removeFavorite(city)
+                _isFavorite.value = false
+            } else {
+                dao.addFavorite(city)
+                _isFavorite.value = true
             }
         }
     }
