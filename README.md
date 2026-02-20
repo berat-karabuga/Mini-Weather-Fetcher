@@ -339,19 +339,6 @@ cd Mini-Weather-Fetcher
 
 ---
 
-## 🔮 Roadmap
-
-- [ ] 🌡️ Fahrenheit / Celsius toggle
-- [ ] 🌙 Dynamic dark mode
-- [ ] 🔔 Background weather alerts
-- [ ] 📍 Home screen widget
-- [ ] 📊 Interactive temperature trend charts
-- [ ] 🌍 EN / TR full language switch
-- [ ] 🗺️ Map-based city picker
-- [ ] 💾 Offline cached weather fallback
-
----
-
 ## 🤝 Contributing
 
 ```bash
